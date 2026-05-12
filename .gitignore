@@ -1,0 +1,5 @@
+# Ignore local tooling
+.DS_Store
+*.swp
+.env
+.env.*
