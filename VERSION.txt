@@ -1,1 +1,1 @@
-brain-e2e-fixture 0.0.4
+brain-e2e-fixture 0.0.5
