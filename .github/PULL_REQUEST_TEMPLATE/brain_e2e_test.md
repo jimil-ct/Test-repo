@@ -14,13 +14,16 @@ docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 
 ### 3) Save the description
 
-GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` for processing.
+GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when `BRAIN_ENABLED=true` on platform backend).
 
 ### 4) Verify in Brain (JWT `org_id` = CT org tied to this GitHub installation)
 
 - `GET {brain-api}/v1/changes?limit=30`
 - `POST {brain-api}/v1/query` — structured filter `change_id`
 - `GET {brain-api}/v1/changes/{id}/graph`
+  
+  > ⚠️ **Security Note**: Graph queries should be implemented with limits: max depth=10, max nodes=1000, timeout=30s, and per-user rate limiting to prevent resource exhaustion.
+
 - UI: Brain → Graph, same `chg_…`
 
 ---
