@@ -14,6 +14,18 @@ docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 
 ### 3) Save the description
 
+
+### 3.1) Redpanda Security Requirements
+
+**PRODUCTION SECURITY:** The Redpanda `raw.git` topic **MUST** have:
+
+- 🔒 SASL authentication enabled
+- 🔒 TLS encryption for client-broker communication
+- 🔒 Topic ACLs: CTBackend (write-only), Brain API (read-only)
+- 🔒 Network segmentation to restrict unauthorized broker access
+
+**TEST/DEV:** Verify authentication is disabled only in development.
+
 GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when `BRAIN_ENABLED=true` on platform backend).
 
 ### 4) Verify in Brain (JWT `org_id` = CT org tied to this GitHub installation)
