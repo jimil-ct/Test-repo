@@ -46,7 +46,7 @@ Webhooks must hit your **public** CT API (ngrok in local dev). See your internal
 4. **Mint** a change id:
 
    ```bash
-   docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
+   # Generate via API endpoint or use: python3 -c "from ulid import ULID; print(f'chg_{ULID()}')"
    ```
 
 5. Paste into the PR description:
