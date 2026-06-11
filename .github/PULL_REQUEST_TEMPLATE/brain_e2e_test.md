@@ -2,6 +2,13 @@
 
 ### 1) Mint a `change_id` (run where `brain-api` Docker container exists)
 
+> **⚠️ SECURITY WARNING**: Client-side change_id generation creates security vulnerabilities:
+> - Enables unauthorized change injection and enumeration
+> - ULIDs are time-sortable and predictable within time windows
+> - No server-side access control binding
+> 
+> **SECURE ALTERNATIVE**: Generate change_ids server-side on webhook ingestion using cryptographically random UUIDs bound to GitHub installation.
+
 ```bash
 docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 ```
