@@ -12,11 +12,14 @@ docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 <!-- change-id: chg_PASTE_YOUR_ULID_HERE -->
 ```
 
+> **WARNING:** Do not edit this PR description after saving, as it may create inconsistent state
+> between GitHub and Brain API. If you must edit, consider:
+> 1. Delete the existing `change-id` from the description
+> 2. Mint a new `change_id` following step 1 above
+> 3. Add the new `change-id` to the description
+> 4. Verify the new state in Brain (step 4)
+
 ### 3) Save the description
-
-**WARNING: Do not edit PR description after saving.** Editing the description after initial webhook delivery creates inconsistent state between GitHub and Brain API. The Brain API currently does not handle `pull_request edited` webhooks.
-
-If you must change the `change_id`, close this PR and create a new one with the correct ID.
 
 GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when `BRAIN_ENABLED=true` on platform backend).
 
