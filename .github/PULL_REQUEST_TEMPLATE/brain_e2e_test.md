@@ -14,7 +14,7 @@ docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 
 ### 3) Save the description
 
-GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` when the platform backend is configured for Brain integration.
+GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` for processing.
 
 ### 4) Verify in Brain (JWT `org_id` = CT org tied to this GitHub installation)
 
