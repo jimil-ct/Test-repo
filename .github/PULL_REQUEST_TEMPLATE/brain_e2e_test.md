@@ -13,8 +13,10 @@ docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 ```
 
 ### 3) Save the description
+GitHub sends webhooks (**signed with HMAC-SHA256**) → CognitivTrust → Redpanda `raw.git` (when `BRAIN_ENABLED=true` on platform backend).
 
-GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` for processing.
+Server *MUST* verify the `X-Hub-Signature-256` header using stored GitHub webhook secret before processing payloads. Reject unsigned/replayed/malicious webhooks.
+GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when `BRAIN_ENABLED=true` on platform backend).
 
 ### 4) Verify in Brain (JWT `org_id` = CT org tied to this GitHub installation)
 
