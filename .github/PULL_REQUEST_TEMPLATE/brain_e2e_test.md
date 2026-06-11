@@ -8,23 +8,15 @@ docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 
 ### 2) Paste this line in the PR description (replace with your minted id)
 
+**SECURITY:** Only use valid ULID format (chg_ + 26 chars: 0-9, A-Z excluding I,L,O,U). Never paste untrusted data.
+
 ```html
-<!-- change-id: chg_PASTE_YOUR_ULID_HERE -->
+<!-- change-id: chg_01ARZ3NDEKTSV4RRFFQ69G5FAV -->
 ```
 
+Replace the example `chg_01ARZ3NDEKTSV4RRFFQ69G5FAV` with your minted ULID from step 1.
+
 ### 3) Save the description
-
-
-### 3.1) Redpanda Security Requirements
-
-**PRODUCTION SECURITY:** The Redpanda `raw.git` topic **MUST** have:
-
-- 🔒 SASL authentication enabled
-- 🔒 TLS encryption for client-broker communication
-- 🔒 Topic ACLs: CTBackend (write-only), Brain API (read-only)
-- 🔒 Network segmentation to restrict unauthorized broker access
-
-**TEST/DEV:** Verify authentication is disabled only in development.
 
 GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when `BRAIN_ENABLED=true` on platform backend).
 
