@@ -14,7 +14,12 @@ docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 
 ### 3) Save the description
 
-GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` when the platform backend is configured for Brain integration.
+**Important:** Once saved, do NOT edit the PR description after initial creation. Editing the description can cause state inconsistency between GitHub and the Brain API. If you must edit, contact the Brain API team to manually resynchronize state.
+
+**Limitation:** Currently, the Brain API does not handle `pull_request` edited webhooks. Only initial PR creation webhooks are processed.
+
+
+GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when `BRAIN_ENABLED=true` on platform backend).
 
 ### 4) Verify in Brain (JWT `org_id` = CT org tied to this GitHub installation)
 
