@@ -1,5 +1,12 @@
 ## Context Brain — E2E test PR (fixture repo)
 
+⚠️ **Security Notice**: This template tests an AI/ML system that processes code changes. When testing:
+- Use only trusted, sanitized test data
+- Avoid adversarial inputs that could poison model training
+- Validate all outputs for unexpected behavior
+- Monitor for model drift or anomalous responses
+- Report suspicious patterns to security team
+
 ### 1) Mint a `change_id` (run where `brain-api` Docker container exists)
 
 ```bash
@@ -13,10 +20,6 @@ docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 ```
 
 ### 3) Save the description
-
-**WARNING: Do not edit PR description after saving.** Editing the description after initial webhook delivery creates inconsistent state between GitHub and Brain API. The Brain API currently does not handle `pull_request edited` webhooks.
-
-If you must change the `change_id`, close this PR and create a new one with the correct ID.
 
 GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when `BRAIN_ENABLED=true` on platform backend).
 
