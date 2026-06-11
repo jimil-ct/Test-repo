@@ -2,6 +2,8 @@
 
 ### 1) Mint a `change_id` (run where `brain-api` Docker container exists)
 
+**WARNING: Each PR must have a UNIQUE `change_id`. Never reuse or share IDs between PRs.**
+
 ```bash
 docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 ```
@@ -10,11 +12,13 @@ docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 
 ```html
 <!-- change-id: chg_PASTE_YOUR_ULID_HERE -->
+**IMPORTANT: Ensure the `change_id` below is unique. Do NOT copy from another PR.**
+
 ```
 
 ### 3) Save the description
 
-GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` when the platform backend is configured for Brain integration.
+GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when `BRAIN_ENABLED=true` on platform backend).
 
 ### 4) Verify in Brain (JWT `org_id` = CT org tied to this GitHub installation)
 
