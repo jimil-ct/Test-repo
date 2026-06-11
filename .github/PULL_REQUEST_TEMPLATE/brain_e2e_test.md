@@ -18,7 +18,9 @@ GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when `BRAIN_ENAB
 
 ### 4) Verify in Brain (JWT `org_id` = CT org tied to this GitHub installation)
 
-- `GET {brain-api}/v1/changes?limit=30`
+### 4) Verify in Brain (JWT `org_id` = CT org tied to this GitHub installation)
+
+**REQUIREMENT:** All Brain API endpoints must verify GitHub installation ID and filter changes by repositories the authenticated user has access to via GitHub OAuth scopes.
 - `POST {brain-api}/v1/query` — structured filter `change_id`
 - `GET {brain-api}/v1/changes/{id}/graph`
 - UI: Brain → Graph, same `chg_…`
