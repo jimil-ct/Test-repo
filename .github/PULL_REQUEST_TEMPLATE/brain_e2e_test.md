@@ -1,29 +1,22 @@
 ## Context Brain — E2E test PR (fixture repo)
 
-### 1) Mint a `change_id` (run where `brain-api` Docker container exists)
+### 1) Add change tracking to PR description
 
-```bash
-docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
-```
-
-### 2) Paste this line in the PR description (replace with your minted id)
-
+Note: `change_id` is automatically generated server-side when the webhook is processed.
 ```html
-<!-- change-id: chg_PASTE_YOUR_ULID_HERE -->
+<!-- change-id: auto -->
 ```
 
-### 3) Save the description
-GitHub sends webhooks (**signed with HMAC-SHA256**) → CognitivTrust → Redpanda `raw.git` (when `BRAIN_ENABLED=true` on platform backend).
+### 2) Save the description
 
-Server *MUST* verify the `X-Hub-Signature-256` header using stored GitHub webhook secret before processing payloads. Reject unsigned/replayed/malicious webhooks.
 GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when `BRAIN_ENABLED=true` on platform backend).
 
 ### 4) Verify in Brain (JWT `org_id` = CT org tied to this GitHub installation)
 
 - `GET {brain-api}/v1/changes?limit=30`
-- `POST {brain-api}/v1/query` — structured filter `change_id`
+- `POST {brain-api}/v1/query` — structured filter `change_id` (use server-generated ID from step 1 response)
 - `GET {brain-api}/v1/changes/{id}/graph`
-- UI: Brain → Graph, same `chg_…`
+- UI: Brain → Graph, look for the auto-generated `chg_…` ID
 
 ---
 
