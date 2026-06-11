@@ -1,4 +1,8 @@
 ## Context Brain — E2E test PR (fixture repo)
+### Security Note
+
+**Warning:** This test ingests untrusted code changes into AI/ML systems. Only use trusted test data. Monitor for adversarial inputs.
+
 
 ### 1) Mint a `change_id` (run where `brain-api` Docker container exists)
 
@@ -14,7 +18,7 @@ docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 
 ### 3) Save the description
 
-GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` when the platform backend is configured for Brain integration.
+GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when `BRAIN_ENABLED=true` on platform backend).
 
 ### 4) Verify in Brain (JWT `org_id` = CT org tied to this GitHub installation)
 
