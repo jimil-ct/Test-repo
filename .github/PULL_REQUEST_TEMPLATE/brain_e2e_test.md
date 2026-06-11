@@ -14,7 +14,18 @@ docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 
 ### 3) Save the description
 
-GitHub sends webhooks → CognitivTrust → Brain API (when enabled).
+GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when `BRAIN_ENABLED=true` on platform backend).
+
+**Security Note**: Redpanda must be configured with:
+
+- **SASL Authentication**: Enable SCRAM-SHA-256 or SCRAM-SHA-512
+- **TLS Encryption**: Enable TLS 1.2 or higher for all client connections
+- **Topic ACLs**: Restrict `raw.git` topic access:
+  - CTBackend: write-only permissions
+  - Brain API: read-only permissions
+- **Network Segmentation**: Redpanda brokers must only be accessible from authorized services
+
+Unauthorized access to Redpanda can result in data tampering, unauthorized message injection, or consumption of sensitive repository data.
 
 ### 4) Verify in Brain (JWT `org_id` = CT org tied to this GitHub installation)
 
