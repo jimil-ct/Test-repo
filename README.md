@@ -46,7 +46,8 @@ Webhooks must hit your **public** CT API (ngrok in local dev). See your internal
 4. **Mint** a change id:
 
    ```bash
-   # Generate via API endpoint or use: python3 -c "from ulid import ULID; print(f'chg_{ULID()}')"
+    # Generate a unique change ID using your preferred method (e.g., ULID generator, UUID, or API endpoint)
+    # Example: chg_01HJ9A5ZF6856W3GK4PDVVDJS3
    ```
 
 5. Paste into the PR description:
