@@ -8,13 +8,19 @@ docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 
 ### 2) Paste this line in the PR description (replace with your minted id)
 
+⚠️ **Security Note**: Only use the generated ULID from step 1. Do not include additional text, commands, or instructions in the change-id field, as PR content is processed by AI systems.
+
 ```html
 <!-- change-id: chg_PASTE_YOUR_ULID_HERE -->
 ```
 
+**Valid format**: `chg_` followed by exactly 26 alphanumeric characters (ULID)
+**Example**: `<!-- change-id: chg_01ARZ3NDEKTSV4RRFFQ69G5FAV -->`
+**Invalid**: Any additional text, nested comments, or non-ULID content
+
 ### 3) Save the description
 
-GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` for processing.
+GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when `BRAIN_ENABLED=true` on platform backend).
 
 ### 4) Verify in Brain (JWT `org_id` = CT org tied to this GitHub installation)
 
