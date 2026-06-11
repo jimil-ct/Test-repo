@@ -3,6 +3,14 @@
 ### 1) Mint a `change_id` (run where `brain-api` Docker container exists)
 
 ```bash
+**IMPORTANT:** Each `change_id` must be unique. If multiple PRs use the same ID, it causes state corruption.
+
+ **Step 1.1:** First check for existing IDs:
+```bash
+curl -H "Authorization: Bearer $JWT_TOKEN" ${BRAIN_API_URL}/v1/changes?limit=100
+```
+
+ **Step 1.2:** Generate a new unique ID:
 docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 ```
 
@@ -12,11 +20,10 @@ docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 <!-- change-id: chg_PASTE_YOUR_ULID_HERE -->
 ```
 
+**Note:** If you get a conflict error, generate a new `change_id` and try again.
+
+
 ### 3) Save the description
-
-**WARNING: Do not edit PR description after saving.** Editing the description after initial webhook delivery creates inconsistent state between GitHub and Brain API. The Brain API currently does not handle `pull_request edited` webhooks.
-
-If you must change the `change_id`, close this PR and create a new one with the correct ID.
 
 GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when `BRAIN_ENABLED=true` on platform backend).
 
