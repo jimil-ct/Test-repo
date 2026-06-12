@@ -17,8 +17,14 @@ docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 **WARNING: Do not edit PR description after saving.** Editing the description after initial webhook delivery creates inconsistent state between GitHub and Brain API. The Brain API currently does not handle `pull_request edited` webhooks.
 
 If you must change the `change_id`, close this PR and create a new one with the correct ID.
+GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when `BRAIN_ENABLED=true` on platform backend).
 
-GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when enabled on platform backend).
+**Security Note:** CTBackend should filter incoming webhook events. Only safe events (`pull_request`, `push`) should be processed.
+
+**Required:** Implement webhook event type validation and rate limiting per-repository and per-event-type in CTBackend.
+
+**Current Limitation:** The Brain API currently does not handle `pull_request edited` webhooks, which creates inconsistent state.
+GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when `BRAIN_ENABLED=true` on platform backend).
 
 ### 4) Verify in Brain (JWT `org_id` = CT org tied to this GitHub installation)
 
