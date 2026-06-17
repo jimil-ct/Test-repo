@@ -12,7 +12,24 @@ docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 <!-- change-id: chg_PASTE_YOUR_ULID_HERE -->
 ```
 
-### 3) Save the description
+### 3) Ensure GitHub webhook secret is configured
+
+Before saving the PR description, verify that your GitHub repository webhook is configured with a secret token:
+
+1. Go to GitHub repo Settings → Webhooks → select the CognitiveTrust webhook
+2. Verify that the *Secret* field is populated (at least 20 random bytes)
+3. If missing, generate a secure webhook secret and configure it both in GitHub and CognitiveTrust webhook receiver
+
+```bash
+# Generate a secure webhook secret (example)
+openssl rand -base64 32
+```
+
+The webhook receiver **must** validate `X-Hub-Signature-256` on every incoming request using HMAC-SHA256 and constant-time comparison. Reject unsigned or incorrectly signed requests with HTTP 401/403.
+
+Reference: https://docs.github.com/webhooks/using-webhooks/validating-webhook-deliveries
+
+### 4) Save the description
 
 **WARNING: Do not edit PR description after saving.** Editing the description after initial webhook delivery creates inconsistent state between GitHub and Brain API. The Brain API currently does not handle `pull_request edited` webhooks.
 
@@ -20,15 +37,8 @@ If you must change the `change_id`, close this PR and create a new one with the 
 
 GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when enabled on platform backend).
 
-**Security Note:** The CognitivTrust webhook receiver **must** validate GitHub webhook signatures using HMAC-SHA256 verification of the `X-Hub-Signature-256` header against the configured webhook secret. Failure to validate signatures allows attackers to forge malicious webhook payloads, inject arbitrary `change_id` values, or manipulate Brain API state.
-
-**Implementation Requirements:**
-```
-Receiver must: extract X-Hub-Signature-256 from request header, compute HMAC-SHA256 of raw request body using webhook secret, compare using constant-time comparison, reject invalid/missing signatures before parsing. Store secret securely (env/secrets manager) and log validation failures.
-```
-
 ### 4) Verify in Brain (JWT `org_id` = CT org tied to this GitHub installation)
-
+### 5) Verify in Brain (JWT `org_id` = CT org tied to this GitHub installation)
 - `GET {brain-api}/v1/changes?limit=30`
 - `POST {brain-api}/v1/query` — structured filter `change_id`
 - `GET {brain-api}/v1/changes/{id}/graph`
