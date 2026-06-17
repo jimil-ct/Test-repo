@@ -34,25 +34,26 @@ Use **SSH** if you prefer: `git@github.com:<USER>/<REPO>.git`
 
 In the CognitivTrust app: **Settings → Integrations → GitHub** → ensure this new repository is **selected** for the installation (or add it in GitHub App **repository access**).
 
-### Webhook Configuration (Development)
+**Secure Webhook Configuration (Local Development)**
 
-**⚠️ SECURITY NOTICE:** Webhooks carry sensitive GitHub data and must be protected even in development.
+Webhooks must hit your public CT API endpoint. **For local development only:**
 
-**Recommended (secure):** Use GitHub CLI webhook forwarding with automatic signature validation:
-```bash
-gh webhook forward --events=pull_request,pull_request_review --url=http://localhost:3000/api/webhooks/github
-```
+1. **Recommended**: Use GitHub CLI webhook forwarding (secure, no public exposure):
+   ```bash
+   gh webhook forward --events=pull_request,pull_request_review --url=http://localhost:3000/webhooks/github
+   ```
 
-**Alternative (ngrok):** If using ngrok, **MUST** use reserved domain with authentication and IP allowlisting:
-```bash
-# 1. Reserve domain: https://dashboard.ngrok.com/cloud-edge/domains
-# 2. Configure webhook signature validation (WEBHOOK_SECRET env var required)
-# 3. Start tunnel with access control:
-ngrok http 3000 --domain=your-reserved.ngrok.app --basic-auth="user:$(openssl rand -base64 32)"
-# 4. Configure GitHub webhook with signature secret and IP allowlist (https://api.github.com/meta hooks field)
-```
+2. **If using ngrok**: You MUST configure security controls:
+   - Use a **reserved domain** with basic authentication:
+     ```bash
+     ngrok http --domain=your-reserved-domain.ngrok.app --basic-auth="user:strong-password" 3000
+     ```
+   - **Mandatory**: Configure `WEBHOOK_SECRET` env and validate GitHub webhook signatures (`x-hub-signature-256`) in your handler.
+   - Restrict IP access to GitHub webhook ranges: `https://api.github.com/meta` (`hooks` field).
 
-**🚫 NEVER use ngrok for production/staging environments.** See internal doc: `docs/features/integrations/github.md`.
+**⚠️ WARNING:** Never use ngrok or public tunnels in production/staging environments.
+
+See your internal doc: `docs/features/integrations/github.md` for webhook signature validation implementation.
 
 ---
 
