@@ -23,32 +23,29 @@ GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when enabled on 
 ### 4) Verify in Brain (JWT `org_id` = CT org tied to this GitHub installation)
 
 - `GET {brain-api}/v1/changes?limit=30`
-- `POST {brain-api}/v1/query` — structured filter `change_id`
+***.1) Functional verification**
+
+- `GET {brain-api}/v1/changes?limit=30`
 - `GET {brain-api}/v1/changes/{id}/graph`
+- UI: Brain → Graph, same `chg_…`
 
-### 5) Verify Rate Limiting Enforcement
 
-**Expected Rate Limits (per JWT subject/org_id, shared across API Gateway replicas via Redis):**
+***.2) Rate limiting verification**
 
+Verify API Gateway rate limits are enforced before deployment:
+
+**Expected rate limits per endpoint tier** (per JWT `subject`/`org_id`, NOT per IP):
 - `GET /v1/changes`: 100 req/min
 - `POST /v1/query`: 10 req/min
 - `GET /v1/changes/{id}/graph`: 5 req/min
 
-**Test Procedure:**
-
-1. Send burst exceeding the limit for each endpoint tier:
-   ```bash
-   # Example: Exceed GET /v1/changes limit
-   for i in {1..105}; do curl -H "Authorization: Bearer $JWT" {brain-api}/v1/changes?limit=1; done
-   ```
-2. Verify HTTP 429 response with `Retry-After` header on requests exceeding limit.
-3. Confirm rate limit scope is per JWT subject/org_id (not per IP):
-   - Use same JWT from different IPs → same rate limit bucket
-   - Use different JWTs (different org_id) → independent rate limit buckets
-4. Verify rate limit state is shared across API Gateway replicas (Redis-backed, not in-memory).
-5. Cross-reference production API Gateway configuration to confirm documented limits match deployed rules.
-
-- UI: Brain → Graph, same `chg_…`
+**Test procedure**:
+1. Send burst request exceeding endpoint limit (e.g., 15 `POST /v1/query` requests in 60 seconds)
+2. Verify endpoint returns `HTTP 429 Too Many Requests`
+3. Verify response includes `Retry-After` header with wait time in seconds
+4. Verify rate limit scope: burst from same JWT `token.subject` or token.org_id` should trigger 429; burst from different org/user should not
+5. Verify rate limit state is shared across API Gateway replicas (Redis/memcached, not in-memory)
+6. Cross-reference API Gateway configuration in production IaC/K8s manifests to confirm limits match test expectations
 
 ---
 
