@@ -18,7 +18,20 @@ docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 
 If you must change the `change_id`, close this PR and create a new one with the correct ID.
 
+### Webhook Security Requirements
+
 GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when enabled on platform backend).
+
+**CRITICAL:** The webhook receiver MUST validate GitHub's signature before processing any payload:
+
+- **Required Header:** `X-Hub-Signature-256` must be present and valid
+- **Validation:** HMAC-SHA256 signature computed using the shared webhook secret
+- **Reject unsigned/invalid requests:** HTTP 401 or 403
+- **Accept valid signatures:** HTTP 200
+
+**Security Reference:** [GitHub Webhook Signature Validation](https://docs.github.com/webhooks/using-webhooks/validating-webhook-deliveries)
+
+Without signature validation, attackers can forge webhook payloads to trigger unauthorized Brain API operations.
 
 ### 4) Verify in Brain (JWT `org_id` = CT org tied to this GitHub installation)
 
