@@ -34,7 +34,25 @@ Use **SSH** if you prefer: `git@github.com:<USER>/<REPO>.git`
 
 In the CognitivTrust app: **Settings → Integrations → GitHub** → ensure this new repository is **selected** for the installation (or add it in GitHub App **repository access**).
 
-Webhooks must hit your **public** CT API (ngrok in local dev). See your internal doc: `docs/features/integrations/github.md`.
+### Webhook Configuration (Development)
+
+**⚠️ SECURITY NOTICE:** Webhooks carry sensitive GitHub data and must be protected even in development.
+
+**Recommended (secure):** Use GitHub CLI webhook forwarding with automatic signature validation:
+```bash
+gh webhook forward --events=pull_request,pull_request_review --url=http://localhost:3000/api/webhooks/github
+```
+
+**Alternative (ngrok):** If using ngrok, **MUST** use reserved domain with authentication and IP allowlisting:
+```bash
+# 1. Reserve domain: https://dashboard.ngrok.com/cloud-edge/domains
+# 2. Configure webhook signature validation (WEBHOOK_SECRET env var required)
+# 3. Start tunnel with access control:
+ngrok http 3000 --domain=your-reserved.ngrok.app --basic-auth="user:$(openssl rand -base64 32)"
+# 4. Configure GitHub webhook with signature secret and IP allowlist (https://api.github.com/meta hooks field)
+```
+
+**🚫 NEVER use ngrok for production/staging environments.** See internal doc: `docs/features/integrations/github.md`.
 
 ---
 
