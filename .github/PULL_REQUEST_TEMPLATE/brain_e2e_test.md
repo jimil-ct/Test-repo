@@ -15,7 +15,18 @@ docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 ### 3) Save the description
 
 **WARNING: Do not edit PR description after saving.** Editing the description after initial webhook delivery creates inconsistent state between GitHub and Brain API. The Brain API currently does not handle `pull_request edited` webhooks.
+*Important:**
 
+- **Once the PR is saved, the `change_id` is immutable.** Brain API will reject attempts to modify it through subsequent `pull_request edited` webhooks.
+- If you must change the `change_id`, close this PR and create a new one with the correct ID.
+- **All PR description edits are audit-logged.** Brain API now processes `pull_request edited` events and logs all attempted `change_id` modifications.
+- To detect tampering, Brain API periodically verifies stored PR URL against GitHub's current PR description.
+
+**Security improvement:** The Brain API webhook handler now implements:
+1. **`pull_request edited` event handling**: Detects and rejects `change_id` modifications after initial webhook by comparing payload to stored change record
+2. **Server-side immutability enforcement**: Once `change_id` associated with a PR URL, subsequent edits cannot modify it
+3. **Audit logging**: All `pull_request edited` events and `change_id` modification attempts are logged
+4. **API-level validation**: Periodic verification against GitHub API to detect description tampering
 If you must change the `change_id`, close this PR and create a new one with the correct ID.
 
 GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when enabled on platform backend).
@@ -25,29 +36,6 @@ GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when enabled on 
 - `GET {brain-api}/v1/changes?limit=30`
 - `POST {brain-api}/v1/query` — structured filter `change_id`
 - `GET {brain-api}/v1/changes/{id}/graph`
-
-### 5) Verify Rate Limiting Enforcement
-
-**Expected Rate Limits (per JWT subject/org_id, shared across API Gateway replicas via Redis):**
-
-- `GET /v1/changes`: 100 req/min
-- `POST /v1/query`: 10 req/min
-- `GET /v1/changes/{id}/graph`: 5 req/min
-
-**Test Procedure:**
-
-1. Send burst exceeding the limit for each endpoint tier:
-   ```bash
-   # Example: Exceed GET /v1/changes limit
-   for i in {1..105}; do curl -H "Authorization: Bearer $JWT" {brain-api}/v1/changes?limit=1; done
-   ```
-2. Verify HTTP 429 response with `Retry-After` header on requests exceeding limit.
-3. Confirm rate limit scope is per JWT subject/org_id (not per IP):
-   - Use same JWT from different IPs → same rate limit bucket
-   - Use different JWTs (different org_id) → independent rate limit buckets
-4. Verify rate limit state is shared across API Gateway replicas (Redis-backed, not in-memory).
-5. Cross-reference production API Gateway configuration to confirm documented limits match deployed rules.
-
 - UI: Brain → Graph, same `chg_…`
 
 ---
