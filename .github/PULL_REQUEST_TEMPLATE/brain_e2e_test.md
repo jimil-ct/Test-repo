@@ -8,9 +8,22 @@ docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 
 ### 2) Paste this line in the PR description (replace with your minted id)
 
+-**IMPORTANT: Format must exactly match this pattern:**
+
+```html
+<!-- change-id: chg_[A-Z0-9]{26} -->
+```
+
+Example:
+
 ```html
 <!-- change-id: chg_PASTE_YOUR_ULID_HERE -->
 ```
+
+**SECURITY REQUIREMENTS:**
+* Use only one change-id comment per PR
+* No nested HTML comments are allowed
+* Exact format: `chg_` followed by exactly 26 alphanumeric characters
 
 ### 3) Save the description
 
