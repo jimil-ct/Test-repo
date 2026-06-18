@@ -1,8 +1,8 @@
 ## Context Brain — E2E test PR (fixture repo)
-
++## 1) Add a `change_id` to the PR description
 ### 1) Mint a `change_id` (run where `brain-api` Docker container exists)
-
-```bash
+***Note:** Change IDs are automatically generated server-side by the Brain API when the webhook is processed.
+If you need to reference a specific change, check the Brain API after PR creation.
 docker exec brain-api python -c "from ulid import ULID; print(f'chg_{ULID()}')"
 ```
 
