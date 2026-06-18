@@ -46,12 +46,18 @@ Webhooks must hit your public CT API endpoint. **For local development only:**
 2. **If using ngrok**: You MUST configure security controls:
    - Use a **reserved domain** with basic authentication:
      ```bash
-     ngrok http --domain=your-reserved-domain.ngrok.app --basic-auth="user:strong-password" 3000
+   - **Mandatory**: Configure `WEBHOOK_SECRET` env variable in your CognitivTrust application.
+   - **Mandatory**: Validate GitHub webhook signatures (`x-hub-signature-256`) in your handler:
+      - Validation MUST occur **BEFORE** any payload parsing or processing.
+      - Use constant-time comparison `crypto.timingSafeEqual()` (Node.js) or `hmac.compare_digest()` (Python).
+      - Reject requests with 401 if signature is missing, malformed, or invalid.
+      - See implementation example: `docs/features/integrations/github.md`
+      - **TEST REQUIRED**: Add integration test that sends forged webhook and verifies 401 response.
      ```
    - **Mandatory**: Configure `WEBHOOK_SECRET` env and validate GitHub webhook signatures (`x-hub-signature-256`) in your handler.
    - Restrict IP access to GitHub webhook ranges: `https://api.github.com/meta` (`hooks` field).
 
-**⚠️ WARNING:** Never use ngrok or public tunnels in production/staging environments.
+**NOTE: GitHub CLI `gh webhook forward` bypasses signature validation since the CLI authenticates to GitHub but localhost endpoint receives unsigned requests. Test with real GitHub webhooks (using ngrok + signature validation) before deploying.**
 
 See your internal doc: `docs/features/integrations/github.md` for webhook signature validation implementation.
 
