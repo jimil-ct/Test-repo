@@ -76,11 +76,24 @@ See your internal doc: `docs/features/integrations/github.md` for webhook signat
 6. Save → confirm GitHub **webhook 200** → wait ~30s → Brain:
 
    - `GET /v1/changes?limit=20`
-   - `POST /v1/query` with `change_id` filter
-   - `GET /v1/changes/{id}/graph`
-   - UI: `/brain/graph` with same id
+   - `GET /v1/changes?limit=20` 
+      ⚠️ **SECURITY**: Brain API must filter by `org_id` from JWT token. Only changes belonging to the requesting organization should be returned.
+   - `POST /v1/query` with `change_id` filter 
+      ⚠️ **SECURITY**: Brain API must validate that the `change_id` belongs to the `org_id` from the JWT token. Query must include: `WHERE change_id = ? AND org_id = token.org_id`.
+   - `GET /v1/changes/{id}/graph` 
+      ⚠️ **SECURITY**: Brain API must verify that the `{id}` (change-id) belongs to the `org_id` from the JWT token before returning any data. Query must include: `SELECT * FROM changes WHERE change_id = ? AND org_id = token.org_id`.
+   - UI: `/brain/graph` with same id 
+      ⚠��� **SECURITY**: UI must call Brain API with user JWT, and the API must enforce org_id isolation.
+ 
+   **CROSS-ORG ISOLATION TEST**: 
+   - Create change-ids in two different GitHub organizations/installations.
+   - Verify that org A's JWT cannot query or retrieve org B's change-id via any endpoint.
+   - Verify that attempting to access a change-id from another org returns 404 Not Found or 403 Forbidden, not 200 with data.
 
----
+   **NOTE**: Consider server-minting change-ids (instead of user-minted) to reduce predictability and tighten security.
+ 
+   This test MUST be added to `.github/PULL_REQUEST_TEMPLATE/brain_e2e_test.md` and executed in integration test coverage.
+   - `GET /v1/changes/{id}/graph`
 
 ## What’s in this repo
 
