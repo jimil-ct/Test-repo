@@ -20,6 +20,9 @@ If you must change the `change_id`, close this PR and create a new one with the 
 
 GitHub sends webhooks → CognitivTrust → Redpanda `raw.git` (when enabled on platform backend).
 
+**SECURITY REQUIQEMENT:** All GitHub webhooks must be verified using X-Hub-Signature-256 HMAC signature verification with stored webhook secret. Unsigned or invalid webhooks must be rejected, and verification failures must be logged.
+**IMPLEMENTATION:** Webhook handler code must implement strict signature validation before processing any payload.
+
 ### 4) Verify in Brain (JWT `org_id` = CT org tied to this GitHub installation)
 
 - `GET {brain-api}/v1/changes?limit=30`
