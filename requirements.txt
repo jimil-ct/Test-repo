@@ -1,0 +1,16 @@
+Flask==3.1.0
+SQLAlchemy==2.0.36
+PyJWT==2.10.1
+requests==2.32.3
+psycopg2-binary==2.9.10
+cryptography==44.0.0
+pyyaml==6.0.2
+celery==5.4.0
+redis==5.2.1
+boto3==1.35.84
+gunicorn==23.0.0
+python-dotenv==1.0.1
+pydantic==2.10.3
+httpx==0.28.1
+passlib==1.7.4
+bcrypt==4.2.1
